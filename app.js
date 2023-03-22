@@ -15,18 +15,20 @@ app.use((err, req, res, next) => {
     res.status(500).send({ code: 500, msg: '服务器端错误' })
 })
 // 使用路由
-const loginRouter = require('./router/login')
-const registerRouter = require('./router/register')
-const commentRouter = require('./router/comment')
+const userRouter = require('./router/user')
+const newsRouter = require('./router/news')
+const communityRouter = require('./router/community')
+
 
 //解决跨域
 app.use(express.urlencoded({
     extended: true
 }))
 //使用路由器
-app.use('/user/login', loginRouter)
-app.use('/user/register', registerRouter)
-app.use('/admin/comment', commentRouter)
+app.use('/user/', userRouter)
+app.use('/news/', newsRouter)
+app.use('/community/', communityRouter)
+
 app.use(express.static('public'))
 //报错问题
 
