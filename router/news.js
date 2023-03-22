@@ -16,10 +16,10 @@ router.get('/list/', (req, res, next) => {
 })
 // 新闻的删除接口
 router.post('/del/',(req,res,next)=>{
-    let news_id = req.body // post请求参数在req.body中
+    let news_id = req.body.news_id // post请求参数在req.body中
     // 表单验证通过，执行添加操作
   
-    let sql = "select * from news where  news_id=?";
+    let sql = "delete from news where  news_id=?";
     pool.query(sql, [news_id], (err, r) => {
       if(err){
         return next(err)
