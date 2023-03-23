@@ -33,7 +33,7 @@ router.post('/del/',(req,res,next)=>{
     let schema = Joi.object({
       news_id: Joi.string().required(), // 必填
     });
-    let { error, value } = schema.validate(req.query);
+    let { error, value } = schema.validate(req.body);
     if (error) {
       res.send(Response.error(400, error));
       return; // 结束
@@ -57,7 +57,7 @@ router.post('/add/',(req,res,next)=>{
       news_content: Joi.string().required(),
       news_time: Joi.string().required(), // 必填
     });
-    let { error, value } = schema.validate(req.query);
+    let { error, value } = schema.validate(req.body);
     if (error) {
       res.send(Response.error(400, error));
       return; // 结束
@@ -80,7 +80,7 @@ router.post('/update/',(req,res,next)=>{
       news_time: Joi.string().required(), // 必填
       news_id: Joi.string().required(), // 必填
     });
-    let { error, value } = schema.validate(req.query);
+    let { error, value } = schema.validate(req.body);
     if (error) {
       res.send(Response.error(400, error));
       return; // 结束
@@ -90,6 +90,9 @@ router.post('/update/',(req,res,next)=>{
       if(err){
         return next(err)
       }
+      if(r.affectedRows == 0){
+        res.send({code: 400, msg: '没有这条数据'}) 
+    }
       res.send({code: 200, msg: '修改成功'})
     });
 })

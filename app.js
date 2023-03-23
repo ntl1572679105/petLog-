@@ -18,6 +18,7 @@ app.use((err, req, res, next) => {
 const userRouter = require('./router/user')
 const newsRouter = require('./router/news')
 const communityRouter = require('./router/community')
+const EncyclopediasRouter = require('./router/Encyclopedias')
 
 
 //解决跨域
@@ -28,6 +29,7 @@ app.use(express.urlencoded({
 app.use('/user/', userRouter)
 app.use('/news/', newsRouter)
 app.use('/community/', communityRouter)
+app.use('/Encyclopedias/', EncyclopediasRouter)
 
 app.use(express.static('public'))
 //报错问题

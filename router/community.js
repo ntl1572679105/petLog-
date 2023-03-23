@@ -1,4 +1,3 @@
-//获取当前页评论
 //首页
 const express = require('express');
 //引入连接池
@@ -16,7 +15,7 @@ router.post('/addInvite/', (req, res, next) => {
     invitation_time: Joi.string().required(),
     user_id: Joi.string().required(), // 必填
   });
-  let { error, value } = schema.validate(req.query);
+  let { error, value } = schema.validate(req.body);
   if (error) {
     res.send(Response.error(400, error));
     return; // 结束
@@ -36,7 +35,7 @@ router.get('/list/id/', (req, res, next) => {
 let schema = Joi.object({
   user_id: Joi.string().required(), // 必填
 });
-let { error, value } = schema.validate(req.query);
+let { error, value } = schema.validate(req.body);
 if (error) {
   res.send(Response.error(400, error));
   return; // 结束
@@ -81,7 +80,7 @@ router.post('/state/',(req,res,next) => {
     user_id: Joi.string().required(), // 必填
     invitation_state: Joi.string().required() // 必填
   });
-  let { error, value } = schema.validate(req.query);
+  let { error, value } = schema.validate(req.body);
   if (error) {
     res.send(Response.error(400, error));
     return; // 结束
@@ -103,7 +102,7 @@ router.post('/update/',(req,res,next) => {
     invitation_time: Joi.string().required(),
     invitation_id: Joi.string().required() // 必填
   });
-  let { error, value } = schema.validate(req.query);
+  let { error, value } = schema.validate(req.body);
   if (error) {
     res.send(Response.error(400, error));
     return; // 结束
@@ -122,7 +121,7 @@ router.post('/del/',(req,res,next) => {
     let schema = Joi.object({
       invitation_id: Joi.string().required(), // 必填
     });
-    let { error, value } = schema.validate(req.query);
+    let { error, value } = schema.validate(req.body);
     if (error) {
       res.send(Response.error(400, error));
       return; // 结束
@@ -143,7 +142,7 @@ router.post('/add/commenton',(req,res,next) => {
     invitation_id: Joi.string().required(), // 必填
     user_id: Joi.string().required()
   });
-  let { error, value } = schema.validate(req.query);
+  let { error, value } = schema.validate(req.body);
   if (error) {
     res.send(Response.error(400, error));
     return; // 结束
