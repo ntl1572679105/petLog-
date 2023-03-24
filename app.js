@@ -19,7 +19,7 @@ const userRouter = require('./router/user')
 const newsRouter = require('./router/news')
 const communityRouter = require('./router/community')
 const EncyclopediasRouter = require('./router/Encyclopedias')
-
+const petshopRouter = require('./router/petshop')
 
 //解决跨域
 app.use(express.urlencoded({
@@ -30,7 +30,7 @@ app.use('/user/', userRouter)
 app.use('/news/', newsRouter)
 app.use('/community/', communityRouter)
 app.use('/Encyclopedias/', EncyclopediasRouter)
-
+app.use('/petshop',petshopRouter)
 app.use(express.static('public'))
 //报错问题
 
