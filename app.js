@@ -18,6 +18,7 @@ app.use((err, req, res, next) => {
 const loginRouter = require('./router/login')
 const registerRouter = require('./router/register')
 const commentRouter = require('./router/comment')
+const petshopRouter = require('./router/petshop')
 
 //解决跨域
 app.use(express.urlencoded({
@@ -27,6 +28,7 @@ app.use(express.urlencoded({
 app.use('/user/login', loginRouter)
 app.use('/user/register', registerRouter)
 app.use('/admin/comment', commentRouter)
+app.use('/petshop',petshopRouter)
 app.use(express.static('public'))
 //报错问题
 

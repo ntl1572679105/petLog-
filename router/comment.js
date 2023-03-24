@@ -5,7 +5,7 @@ const express = require('express');
 const pool = require('../pool')
 const Response = require("../utils/Response.js");
 const router = express.Router()
-router.get('/commment/', (req, res, next) => {
+router.get('/commment', (req, res, next) => {
   var obj = req.query
   pool.query('select * from com', [obj.aid], (err, r) => {
       if (err) {
