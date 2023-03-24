@@ -20,7 +20,6 @@ router.post('/addInvite/', (req, res, next) => {
     res.send(Response.error(400, error));
     return; // 结束
   }
-  le
   pool.query('insert into invitation(invitation_title,invitation_content,invitation_time,user_id) values(?,?,?,?)', [invitation_title, invitation_content, invitation_time, user_id], (err, r) => {
     if (err) {
       return next(err)
@@ -30,24 +29,29 @@ router.post('/addInvite/', (req, res, next) => {
 })
 // 2.用户根据信息的用户id查询信息接口
 router.get('/list/id/', (req, res, next) => {
-  let user_id = req.query.user_id
+  let { user_id,page,pagesize }= req.query
 // 表单验证
 let schema = Joi.object({
   user_id: Joi.string().required(), // 必填
+  page: Joi.string().required(), // 必填
+  pagesize: Joi.string().required(), // 必填
 });
-let { error, value } = schema.validate(req.body);
+let { error, value } = schema.validate(req.query);
 if (error) {
   res.send(Response.error(400, error));
   return; // 结束
 }
-  pool.query('select * from invitation where `user_id` = ?', [user_id], (err, r) => { 
+let startIndex = (page - 1) * 10;
+let size = parseInt(pagesize);
+  pool.query('select * from invitation where `user_id` = ? limit ?,?;select count(*) as count from invitation where `user_id` = ?', [user_id,startIndex,size,user_id], (err, r) => { 
     if (err) {
       return next(err)
     }
+    let total = r[1][0].count
     if (r.length == 0) {
       res.send({ code: 400, msg: '没有该用户的评论'})
     } else {
-      res.send({ code: 200, msg: '查询成功', data: r })
+      res.send({ code: 200, msg: '查询成功', data: r[0] ,page,pagesize,total})
 
     }
   })
@@ -66,18 +70,19 @@ router.get('/list',(req,res,next) => {
   }
   let startIndex = (page - 1) * 10;
   let size = parseInt(pagesize);
-  pool.query('select * from invitation limit ?,?',[startIndex, size],(err,r) => {
+  pool.query('select * from invitation limit ?,?;select count(*) as count from invitation',[startIndex, size],(err,r) => {
+    let total = r[1][0].count
     if (err) {
       return next(err)
     }
-    res.send({ code: 200, msg: '查询成功', data: r })
+    res.send({ code: 200, msg: '查询成功', data: r[0] ,page,pagesize,total})
   })
 })
 // 修改信息状态
 router.post('/state/',(req,res,next) => {
   let {invitation_state,invitation_id} = req.body
   let schema = Joi.object({
-    user_id: Joi.string().required(), // 必填
+    invitation_id: Joi.string().required(), // 必填
     invitation_state: Joi.string().required() // 必填
   });
   let { error, value } = schema.validate(req.body);
@@ -152,7 +157,7 @@ router.post('/add/commenton',(req,res,next) => {
     if (err) {
       return next(err)
     }
-    res.send({ code: 200, msg: '添加' })
+    res.send({ code: 200, msg: '评论成功' })
   })
 })
 module.exports = router

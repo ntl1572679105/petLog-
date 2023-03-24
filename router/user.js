@@ -12,7 +12,7 @@ router.post("/login", (req, resp) => {
   let { user_phone, user_pwd } = req.body
   // 表单验证
   let schema = Joi.object({
-    user_phone: Joi.string().required().regex(/^(?:(?:\+|00)86)?1(?:(?:3[\d])|(?:4[5-79])|(?:5[0-35-9])|(?:6[5-7])|(?:7[0-8])|(?:8[\d])|(?:9[1589]))\d{8}$/),
+    user_phone: Joi.string().required().regex(/^(?:(?:\+|00)86)?1[3-9]\d{9}$/),
     user_pwd: Joi.string().required().regex(/^\S*(?=\S{6,})(?=\S*\d)(?=\S*[A-Z])(?=\S*[a-z])(?=\S*[!@#$%^&*? ])\S*$/), // 必填
   });
   let { error, value } = schema.validate(req.body);

@@ -20,11 +20,12 @@ router.get('/list/', (req, res, next) => {
   }
   let startIndex = (page - 1) * 10;
   let size = parseInt(pagesize);
-    pool.query('select * from news limit ?,?', [startIndex, size] ,(err, r) => {
+    pool.query('select * from news limit ?,?;select count(*) as count from news', [startIndex, size] ,(err, r) => {
         if (err) {
           return next(err)
         }
-        res.send({ code: 200, msg: 'ok',data:r })
+        let total = r[1][0].count
+        res.send({ code: 200, msg: 'ok',data:r[0] ,page,pagesize,total})
       });
 })
 // 新闻的删除接口

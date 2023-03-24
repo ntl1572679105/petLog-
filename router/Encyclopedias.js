@@ -19,11 +19,12 @@ router.get('/list/', (req, res, next) => {
     }
     let startIndex = (page - 1) * 10;
     let size = parseInt(pagesize);
-      pool.query('select * from science limit ?,?', [startIndex, size] ,(err, r) => {
+      pool.query('select * from science limit ?,?;select count(*) as count from science', [startIndex, size] ,(err, r) => {
+        let total = r[1][0].count
           if (err) {
             return next(err)
           }
-          res.send({ code: 200, msg: 'ok',data:r })
+          res.send({ code: 200, msg: 'ok',data:r[0] ,page,pagesize,total})
         });
   })
   // 科普的删除接口
@@ -43,7 +44,10 @@ router.get('/list/', (req, res, next) => {
         if(err){
           return next(err)
         }
-        res.send({code: 200, msg: '删除成功',data:r})
+        if(r.affectedRows == 0){
+          return res.send({code: 400, msg: '没有这条数据'}) 
+      }
+        res.send({code: 200, msg: '删除成功'})
       });
   })
   // 新增科普
@@ -88,9 +92,10 @@ router.get('/list/', (req, res, next) => {
           return next(err)
         }
         if(r.affectedRows == 0){
-            res.send({code: 400, msg: '没有这条数据'}) 
+          return  res.send({code: 400, msg: '没有这条数据'}) 
+            
         }
-        res.send({code: 200, msg: '修改成功',data:r})
+        res.send({code: 200, msg: '修改成功'})
       });
   })
   module.exports = router
