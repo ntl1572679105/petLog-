@@ -79,8 +79,28 @@ router.post('/deletecommondity',(req,resp,next)=>{
         resp.send({code: 200, msg: '删除商品成功'})
       });
 })
-
-
+//宠物店模糊查询商品接口
+router.get('/queryListByName',(req,resp,next)=>{
+  let { keyword} = req.query
+  let schema = Joi.object({
+      keyword: Joi.string().required(), // 必填
+   });
+   let { error, value } = schema.validate(req.query);
+   if (error) {
+     resp.send(Response.error(400, error));
+     return; // 结束
+   }
+  let sql = "SELECT * FROM `commondity` WHERE `commondity_name` LIKE ?;"
+  pool.query(sql, ['%' + keyword + '%'], (err, r) => {
+      if(err){
+        return next(err)
+      }
+      if(r.length == 0){
+        resp.send({code: 401, msg: '没有该商品'})
+      }
+      resp.send({code: 200, msg: '查询成功',data:r})
+    });
+})
 // 用户预约洗护接口
 router.post('/addwash',(req,resp,next)=>{
     let {type_id,wash_time,user_id,petshop_id} = req.body

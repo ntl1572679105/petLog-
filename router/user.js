@@ -30,7 +30,7 @@ router.post("/login", (req, resp) => {
     if (result.length == 0) {
       resp.send(Response.error(1001, '账号密码输入错误'));
     } else {
-      resp.send({code:200,msg:'登录成功'})
+      resp.send({ code: 200, msg: '登录成功' })
       // 获取登录用户对象
       // let user = result[0]
       // // 为该用户颁发一个token字符串，未来该客户端若做发送其他请求，则需要在请求Header中携带token，完成状态管理。
@@ -81,6 +81,34 @@ router.post("/query/phone", (req, res, next) => {
     }
   });
 });
+// 用户修改信息
+router.post('/update', (req, res, next) => {
+  let { user_id, user_name, user_phone, user_pwd, user_email, user_avatar } = req.body
+  // 表单验证
+  let schema = Joi.object({
+    user_id: Joi.string().required(),
+    user_phone: Joi.string().required(),
+    user_pwd: Joi.string().required(), // 必填
+    user_name: Joi.string().required(), // 必填
+    user_email: Joi.string().required(), // 必填
+    user_avatar: Joi.string().required(), // 必填
+
+  });
+  let { error, value } = schema.validate(req.body);
+  if (error) {
+    res.send(Response.error(400, error));
+    return; // 结束
+  }
+  pool.query("update user set user_phone=?,user_pwd=?,user_pwd=?,user_name=?,user_avatar=? where user_id=?", [user_phone, user_pwd, user_name, user_email, user_avatar, user_id], (err, r) => {
+    if (err) {
+      return next(err)
+    }
+    if (r.affectedRows == 0) {
+      res.send({ code: 400, msg: '没有改账号' })
+    }
+    res.send({ code: 200, msg: '修改成功' })
+  })
+})
 // 后台登录接口
 router.post("/admin/login", (req, resp) => {
   let { admin_phone, admin_pwd } = req.body
@@ -104,7 +132,7 @@ router.post("/admin/login", (req, resp) => {
     if (r.length == 0) {
       resp.send(Response.error(1001, '账号密码输入错误'));
     } else {
-      resp.send({code:200,msg:'登录成功',data:r})
+      resp.send({ code: 200, msg: '登录成功', data: r })
       // 获取登录用户对象
       // let user = result[0]
       // // 为该用户颁发一个token字符串，未来该客户端若做发送其他请求，则需要在请求Header中携带token，完成状态管理。
@@ -118,8 +146,8 @@ router.post("/admin/login", (req, resp) => {
   })
 });
 // 宠物店添加
-router.post('/petshop/add',(req,res,next) => {
-  let {petshop_name ,petshop_address,petshop_phone} =req.body
+router.post('/petshop/add', (req, res, next) => {
+  let { petshop_name, petshop_address, petshop_phone } = req.body
   let schema = Joi.object({
     petshop_name: Joi.string().required().regex(/^[a-zA-Z][-_a-zA-Z0-9]{5,19}$/),
     petshop_address: Joi.string().required(), // 必填
@@ -132,12 +160,12 @@ router.post('/petshop/add',(req,res,next) => {
     return; // 结束
   }
   let sql = 'insert into petshop(petshop_name,petshop_address,petshop_phone) values(?,?,?)'
-  pool.query(sql,[petshop_name,petshop_address,petshop_phone],(error,r) => {
+  pool.query(sql, [petshop_name, petshop_address, petshop_phone], (error, r) => {
     if (error) {
       res.send(Response.error(500, error));
       throw error;
     }
-    res.send({code:200,msg:'添加成功'})
+    res.send({ code: 200, msg: '添加成功' })
   })
 })
 module.exports = router
