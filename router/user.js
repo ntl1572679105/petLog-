@@ -28,19 +28,20 @@ router.post("/login", (req, resp) => {
       throw error;
     }
     if (result.length == 0) {
-      resp.send(Response.error(1001, '账号密码输入错误'));
-    } else {
-      resp.send({ code: 200, msg: '登录成功' })
-      // 获取登录用户对象
-      // let user = result[0]
-      // // 为该用户颁发一个token字符串，未来该客户端若做发送其他请求，则需要在请求Header中携带token，完成状态管理。
-      // let payload = { id: user.id, nickname: user.nickname }
-      // let token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1d' })
-      // // 返回user对象与token字符串
-      // user.password = undefined
-      // resp.send(Response.ok({ user, token }));
-
+      return resp.send(Response.error(1001, '账号密码输入错误'));
     }
+
+    resp.send({ code: 200, msg: '登录成功' })
+    // 获取登录用户对象
+    // let user = result[0]
+    // // 为该用户颁发一个token字符串，未来该客户端若做发送其他请求，则需要在请求Header中携带token，完成状态管理。
+    // let payload = { id: user.id, nickname: user.nickname }
+    // let token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1d' })
+    // // 返回user对象与token字符串
+    // user.password = undefined
+    // resp.send(Response.ok({ user, token }));
+
+
   })
 });
 // 用户注册
@@ -123,27 +124,42 @@ router.post("/admin/login", (req, resp) => {
     return; // 结束
   }
   // 查询数据库，账号密码是否填写正确
-  let sql = "select * from admin_a where admin_phone=? and admin_pwd=?"
-  pool.query(sql, [admin_phone, admin_pwd], (error, r) => {
+  let sql = "select * from admin_a where admin_phone=? and admin_pwd=?;select * from role where admin_level = (select admin_level from admin_a where admin_phone=?and admin_pwd=?) || admin_level = 0"
+  pool.query(sql, [admin_phone, admin_pwd,admin_phone, admin_pwd], (error, r) => {
     if (error) {
       resp.send(Response.error(500, error));
       throw error;
     }
-    if (r.length == 0) {
+    if (r[0].length == 0) {
       resp.send(Response.error(1001, '账号密码输入错误'));
-    } else {
-      resp.send({ code: 200, msg: '登录成功', data: r })
-      // 获取登录用户对象
-      // let user = result[0]
-      // // 为该用户颁发一个token字符串，未来该客户端若做发送其他请求，则需要在请求Header中携带token，完成状态管理。
-      // let payload = { id: user.id, nickname: user.nickname }
-      // let token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1d' })
-      // // 返回user对象与token字符串
-      // user.password = undefined
-      // resp.send(Response.ok({ user, token }));
-
     }
-  })
+    let rights = []
+      let obj = {}
+      r[1].forEach(item => {
+        obj[item.rid] = item
+      })
+    r[1].forEach(item => {
+      // item.pid 为" "时 返回underfined
+      let parent = obj[item.parent_id]
+      if (parent) {
+        (parent.children || (parent.children = [])).push(item)
+      } else {
+        // 这里push的item是pid为undefined的数据
+        rights.push(item)
+      }
+    })
+    resp.send({ user: r[0], rights,meta:{ code: 200, msg: '登录成功' }})
+  // 获取登录用户对象
+  // let user = result[0]
+  // // 为该用户颁发一个token字符串，未来该客户端若做发送其他请求，则需要在请求Header中携带token，完成状态管理。
+  // let payload = { id: user.id, nickname: user.nickname }
+  // let token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1d' })
+  // // 返回user对象与token字符串
+  // user.password = undefined
+  // resp.send(Response.ok({ user, token }));
+
+
+})
 });
 // 宠物店添加
 router.post('/petshop/add', (req, res, next) => {
