@@ -124,7 +124,7 @@ router.post("/admin/login", (req, resp) => {
     return; // 结束
   }
   // 查询数据库，账号密码是否填写正确
-  let sql = "select * from admin_a where admin_phone=? and admin_pwd=?;select * from role where admin_level = (select admin_level from admin_a where admin_phone=?and admin_pwd=?) || admin_level = 0"
+  let sql = "select * from admin_a where admin_phone=? and admin_pwd=?;select * from role where admin_level = (select admin_level from admin_a where admin_phone=?and admin_pwd=?) ||admin_level = 0"
   pool.query(sql, [admin_phone, admin_pwd,admin_phone, admin_pwd], (error, r) => {
     if (error) {
       resp.send(Response.error(500, error));

@@ -267,4 +267,59 @@ router.get('/getpicbyuserid',(req,resp,next)=>{
   });
 })
 
+//用户根据id查询宠物店信息
+router.get('/listpetshopById',(req,resp,next)=>{
+  let{petshop_id} = req.query
+  let sql = 'select * from petshop where petshop_id = ?'
+  pool.query(sql, [petshop_id], (err, r) => {
+    if (err) {
+      return next(err)
+    }
+    resp.send({ code: 200, msg: '查询宠物店成功',data:r })
+  });
+})
+//查询所有商品
+router.get('/listshop',(req,resp,next)=>{
+  let{page,pagesize} = req.query
+  let schema = Joi.object({
+    page: Joi.number().required(), // page必须是数字，必填
+    pagesize: Joi.number().integer().required(), // pagesize必须是不大于100的数字，必填
+  });
+  let { error, value } = schema.validate(req.query);
+  if (error) {
+    resp.send(Response.error(400, error));
+    return; // 结束
+  }
+  let startIndex = (page - 1) * pagesize;
+  let size = parseInt(pagesize);
+  let sql = 'select * from commondity limit ?,?'
+  pool.query(sql, [startIndex, size], (err, r) => {
+    if (err) {
+      return next(err)
+    }
+    resp.send({ code: 200, msg: '查询所有商品成功',data:r })
+  });
+})
+// 模糊查询宠物店地址
+router.get('/listPetshop/Address',(req,resp,next)=>{
+  let keyword = req.query.keyword
+  let schema = Joi.object({
+    keyword: Joi.string().required()
+  })
+  let{error,value} = schema.validate(req.query)
+  if(error) {
+    resp.send(Response.error(400,error))
+    return
+  }
+  let sql = 'select * from petshop where petshop_address like ?'
+  pool.query(sql,['%' + keyword + '%'],(err,r) => {
+    if(err){
+      return next(err)
+    }
+    if (r.length ==0 ){
+      resp.send({code:400,msg:'没有数据'})
+    }
+    resp.send({code:200,msg:'查询成功',data:r})
+  })
+})
 module.exports = router

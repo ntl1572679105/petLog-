@@ -17,7 +17,7 @@ router.get('/list/', (req, res, next) => {
       res.send(Response.error(400, error));
       return; // 结束
     }
-    let startIndex = (page - 1) * 10;
+    let startIndex = (page - 1) * pagesize;
     let size = parseInt(pagesize);
       pool.query('select * from science limit ?,?;select count(*) as count from science', [startIndex, size] ,(err, r) => {
         let total = r[1][0].count
